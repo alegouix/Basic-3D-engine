@@ -1,0 +1,28 @@
+#include "engine_defs.h"
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+
+int* WINDOW_WIDTH;
+int* WINDOW_HEIGHT;
+int* WINDOW_BPP;
+double* Z0;
+
+void init_engine(){
+
+    WINDOW_WIDTH = (int*)malloc(sizeof(int));
+    WINDOW_HEIGHT = (int*)malloc(sizeof(int));
+    WINDOW_BPP = (int*)malloc(sizeof(int));
+    Z0 = (double*)malloc(sizeof(double));
+
+    if (WINDOW_WIDTH == NULL || WINDOW_HEIGHT == NULL || WINDOW_BPP == NULL || Z0 == NULL){
+        printf("ERROR %d while initialising engine\n", errno);
+        return;
+    }
+
+    *WINDOW_WIDTH = 1200;
+    *WINDOW_HEIGHT = 900;
+    *WINDOW_BPP = 32;
+    *Z0 = (*WINDOW_WIDTH/2)/tan((FOV/2) * M_PI / 180.0);
+}
