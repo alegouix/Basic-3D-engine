@@ -169,7 +169,7 @@ int load_wireframe_model(char* filename, Point*** points, int*** lines, int* n_p
             // printf("%p\n", (*points)[0]);
             // printf("%p\n", (*points)[1]);
             (*points)[np-1] = NULL;            
-            (*points)[np-1] = NewPoint(x, y, z);            
+            (*points)[np-1] = NewPoint(x, y, z);
             break;
         
         case 108: //l

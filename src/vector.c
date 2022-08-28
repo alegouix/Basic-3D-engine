@@ -39,3 +39,11 @@ Vec3 Vec3Normalize(Vec3 v){
     Vec3 u = NewVec3(v.x / norm, v.y / norm, v.z / norm);
     return u;
 }
+
+Vec3 CrossProduct(Vec3 v1, Vec3 v2){
+    return NewVec3(v1.x*v2.y - v1.y*v2.x, v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z);
+}
+
+Vec3 Vec3Round(Vec3 v){
+    return NewVec3((int)v.x, (int)v.y, (int)v.z);
+}

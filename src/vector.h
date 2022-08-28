@@ -13,4 +13,6 @@ double Vec3Dist(Vec3 a, Vec3 b);
 double DotProduct(Vec3 a, Vec3 b);
 double Vec3Norm(Vec3 a);
 Vec3 Vec3Normalize(Vec3 v);
+Vec3 CrossProduct(Vec3 v1, Vec3 v2);
+Vec3 Vec3Round(Vec3 v);
 #endif
