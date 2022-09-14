@@ -2,6 +2,7 @@
 #define _DEFS
 
 #include <math.h>
+#include <SDL2/SDL.h>
 #include "vector.h"
 
 #define RES *WINDOW_WIDTH * *WINDOW_HEIGHT
@@ -24,6 +25,8 @@ extern double* MAX_DEPTH;
 extern double* MIN_DEPTH;
 
 extern Vec3* ROTATION;
+
+extern SDL_Surface* CRATE_TEXTURE;
 
 
 

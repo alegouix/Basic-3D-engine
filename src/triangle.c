@@ -1,7 +1,9 @@
+#include <SDL2/SDL_image.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include "triangle.h"
+#include "engine_defs.h"
 
 /*wrong*/
 Vec3 TriangleNormal(Triangle* t){
@@ -14,7 +16,7 @@ Vec3 TriangleNormal(Triangle* t){
     return r;
 }
 
-Triangle* NewTriangle(Point* p1, Point* p2, Point* p3, char r, char g, char b){
+Triangle* NewTriangle(Point* p1, Point* p2, Point* p3, double u0, double v0, double u1, double v1, double u2, double v2){
     Triangle* t = (Triangle*)malloc(sizeof(Triangle));
 
     t->points[0] = p1;
@@ -25,9 +27,14 @@ Triangle* NewTriangle(Point* p1, Point* p2, Point* p3, char r, char g, char b){
     t->draw_points[1] = p2;
     t->draw_points[2] = p3;
 
-    t->color[0] = r;
-    t->color[1] = g;
-    t->color[2] = b;
+    t->uv[0].x = u0;
+    t->uv[0].y = v0;
+    t->uv[1].x = u1;
+    t->uv[1].y = v1;
+    t->uv[2].x = u2;
+    t->uv[2].y = v2;
+
+    t->texture = CRATE_TEXTURE;
 
     return t;
 }

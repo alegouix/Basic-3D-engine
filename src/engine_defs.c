@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <SDL2/SDL_image.h>
 
 int* WINDOW_WIDTH;
 int* WINDOW_HEIGHT;
@@ -14,6 +15,7 @@ double* DEPTH_BUFFER;
 double* MAX_DEPTH;
 double* MIN_DEPTH;
 Vec3* ROTATION;
+SDL_Surface* CRATE_TEXTURE;
 
 void init_engine(){
 
@@ -44,4 +46,12 @@ void init_engine(){
     *MAX_DEPTH = 0;
 
     ResetDepthBuffer();//memset(DEPTH_BUFFER, 0, *WINDOW_WIDTH**WINDOW_HEIGHT);
+
+
+    CRATE_TEXTURE = IMG_Load("textures/crate-texture.jpg");
+    if (CRATE_TEXTURE == NULL){
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, SDL_GetError());
+        return;
+    }
+
 }

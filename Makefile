@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -Wall -Werror
-LD=-lSDL2 -lSDL2main -lm
+LD=-lSDL2 -lSDL2main -lm -lSDL2_image
 BINPATH=bin
 SRCPATH=src
 

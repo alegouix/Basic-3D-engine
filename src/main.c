@@ -10,6 +10,10 @@ int init(){
         return -1;
     }
 
+    if (!IMG_Init(IMG_INIT_JPG)){
+        return -1;
+    }
+
     screen = SDL_CreateWindow("3D",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, *WINDOW_WIDTH, *WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 
     if (screen == NULL){
@@ -53,23 +57,23 @@ int mainloop(SDL_Window* screen, SDL_Renderer* renderer){
     int n_triangles = 12;
     Triangle** triangles = (Triangle**)calloc(n_triangles, sizeof(Triangle*));
 
-    triangles[0] = NewTriangle(points[0], points[1], points[2], 255, 0, 0);
-    triangles[1] = NewTriangle(points[3], points[1], points[2], 255, 0, 0);
-    triangles[2] = NewTriangle(points[4], points[5], points[6], 0, 255, 0);
-    triangles[3] = NewTriangle(points[7], points[5], points[6], 0, 255, 0);
-    triangles[4] = NewTriangle(points[0], points[2], points[5], 0, 0, 255);
-    triangles[5] = NewTriangle(points[0], points[4], points[5], 0, 0, 255);
-    triangles[6] = NewTriangle(points[1], points[3], points[6], 255, 255, 0);
-    triangles[7] = NewTriangle(points[7], points[3], points[6], 255, 255, 0);
-    triangles[8] = NewTriangle(points[0], points[1], points[4], 255, 0, 255);
-    triangles[9] = NewTriangle(points[6], points[1], points[4], 255, 0, 255);
-    triangles[10] = NewTriangle(points[2], points[3], points[5], 0, 255, 255);
-    triangles[11] = NewTriangle(points[7], points[3], points[5], 0, 255, 255);
+    triangles[0] = NewTriangle(points[0], points[1], points[2], 0, 0, 1, 0, 0, 1);
+    triangles[1] = NewTriangle(points[3], points[1], points[2], 1, 0, 1, 1, 0, 1);
+    triangles[2] = NewTriangle(points[4], points[5], points[6], 0, 0, 1, 0, 0, 1);
+    triangles[3] = NewTriangle(points[7], points[5], points[6], 1, 0, 1, 1, 0, 1);
+    triangles[4] = NewTriangle(points[0], points[2], points[5], 0, 0, 1, 0, 0, 1);
+    triangles[5] = NewTriangle(points[0], points[4], points[5], 1, 0, 1, 1, 0, 1);
+    triangles[6] = NewTriangle(points[1], points[3], points[6], 0, 0, 1, 0, 0, 1);
+    triangles[7] = NewTriangle(points[7], points[3], points[6], 1, 0, 1, 1, 0, 1);
+    triangles[8] = NewTriangle(points[0], points[1], points[4], 0, 0, 1, 0, 0, 1);
+    triangles[9] = NewTriangle(points[6], points[1], points[4], 1, 0, 1, 1, 0, 1);
+    triangles[10] = NewTriangle(points[2], points[3], points[5], 0, 0, 1, 0, 0, 1);
+    triangles[11] = NewTriangle(points[7], points[3], points[5], 1, 0, 1, 1, 0, 1);
 
 
 
     Vec3 rotation = NewVec3(0, 0.005, 0);
-    int drawmode = DRAWMODE_BOTH;
+    int drawmode = DRAWMODE_TRIANGLE;
 
     while (running){
         while (SDL_PollEvent(&event)){
