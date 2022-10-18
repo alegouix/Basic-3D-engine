@@ -32,6 +32,20 @@ void DrawFrame(SDL_Renderer* renderer, int draw_mode, Triangle** triangles, Poin
         break;
     }
 
+
+    /* debug */
+    // SDL_Surface* surf = triangles[0]->texture;
+    // Uint8 r, g, b;
+    // for (int x=0; x<surf->w; x++){
+    //     for (int y=0; y<surf->h; y++){
+    //         SDL_GetRGB(getpixel(surf, x, y), surf->format, &r, &g, &b);
+    //         SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+    //         SDL_RenderDrawPoint(renderer, x, y);
+    //     }
+    // }
+    // SDL_Rect re = {surf->w, 0, surf->w, surf->h};
+    // SDL_RenderCopy(renderer, SDL_CreateTextureFromSurface(renderer, surf), NULL, &re);
+
     SDL_RenderPresent(renderer);
 }
 
@@ -277,7 +291,7 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
 
     double z, zr, zl;
     double *short_segment = x01;
-    int ind=0, s=0, px_index=0;
+    int ind=0, s=0;
     Uint8 r=0,g=0,b=0;
     Point2D pl, pr, p;
 
@@ -320,22 +334,10 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
                 // printf("%p, %d\n", texture, px_index);
                 // printf("%u\n", ((Uint32*)texture->pixels)[px_index]);
                 if (z<0 || z < DEPTH_BUFFER[((int)P0.y+y)**WINDOW_WIDTH + x]){
-                    // p.x = (double)texture->w * fmin(texture->w - 1, (lerp(fmin(pl.x, pr.x), fmax(pl.x, pr.x), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
-                    // p.y = (double)texture->h * fmin(texture->h - 1, (lerp(fmin(pl.y, pr.y), fmax(pl.y, pr.y), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
-                    // px_index = p.y*texture->pitch + p.x*texture->format->BytesPerPixel;
+                    p.x = (double)texture->w * fmin(texture->w - 1, (lerp(fmin(pl.x, pr.x), fmax(pl.x, pr.x), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
+                    p.y = (double)texture->h * fmin(texture->h - 1, (lerp(fmin(pl.y, pr.y), fmax(pl.y, pr.y), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
 
-                    p.x = texture->w * lerp(pl.x, pr.x, (double)(x - short_segment[y-ind]) / (x02[y] - short_segment[y-ind]));
-                    p.y = texture->h * lerp(pl.y, pr.y, (double)(x - short_segment[y-ind]) / (x02[y] - short_segment[y-ind]));
-
-                    px_index = p.y*texture->pitch + p.x;
-                    // printf("%f, %f\n", (double)(x-short_segment[y-ind]), (double)(x02[y]-short_segment[y-ind]));
-                    // printf("%f\n", (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]));
-                    // printf("%f, %f\n", pl.x, pl.y);
-                    // printf("%f, %f\n", pr.x, pr.y);
-                    // printf("%f, %f\n", p.x, p.y);
-                    // printf("%d, %d\n", texture->pitch * texture->h, px_index);
-                    SDL_GetRGB(((Uint32*)texture->pixels)[px_index], texture->format, &r, &g, &b);
-                    // printf("%d, %d, %d\n", r, g, b);
+                    SDL_GetRGB(getpixel(texture, p.x, p.y), texture->format, &r, &g, &b);
                     SDL_SetRenderDrawColor(renderer, r, g, b, 255);
                     SDL_RenderDrawPoint(renderer, x, P0.y+y);
                     DEPTH_BUFFER[((int)P0.y+y)**WINDOW_WIDTH + x] = z;
@@ -361,9 +363,10 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
                 //     printf("%f, %f\n", x02[y], short_segment[y-ind]);
                 // }
                 if (z < DEPTH_BUFFER[((int)P0.y+y)**WINDOW_WIDTH + x]){
-                    px_index = texture->pitch * texture->h * (((int)P0.y+y)**WINDOW_WIDTH + x) / (*WINDOW_HEIGHT * *WINDOW_WIDTH);
-                    // SDL_SetRenderDrawColor(renderer,color[0], color[1], color[2], 255);
-                    SDL_GetRGB(((Uint32*)texture->pixels)[px_index], texture->format, &r, &g, &b);
+                    p.x = (double)texture->w * fmin(texture->w - 1, (lerp(fmin(pl.x, pr.x), fmax(pl.x, pr.x), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
+                    p.y = (double)texture->h * fmin(texture->h - 1, (lerp(fmin(pl.y, pr.y), fmax(pl.y, pr.y), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
+
+                    SDL_GetRGB(getpixel(texture, p.x, p.y), texture->format, &r, &g, &b);
                     SDL_SetRenderDrawColor(renderer, r, g, b, 255);
                     SDL_RenderDrawPoint(renderer, x, P0.y+y);
                     DEPTH_BUFFER[((int)P0.y+y)**WINDOW_WIDTH + x] = z;
@@ -378,6 +381,8 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
         }
     }
             // printf("%f\n", DEPTH_BUFFER[y**WINDOW_WIDTH + x]);
+
+    // printf("%f / %d = %f\n", avg/(double)n, texture->h * texture->pitch, (avg/(double)n)/(double)(texture->h * texture->pitch));
 
     return 0;
 }

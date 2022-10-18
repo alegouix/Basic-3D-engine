@@ -10,5 +10,6 @@ typedef struct {
 double lerp(double x, double y, double p);
 void ResetDepthBuffer();
 void GetRGB(Uint32 color, Uint8* r, Uint8* g, Uint8* b);
+Uint32 getpixel(SDL_Surface *surface, int x, int y);
 
 #endif
