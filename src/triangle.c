@@ -5,10 +5,23 @@
 #include "triangle.h"
 #include "engine_defs.h"
 
-/*wrong*/
 Vec3 TriangleNormal(Triangle* t){
-    Vec3 a = Vec3SubVec3(t->points[0]->position, t->points[1]->position);
-    Vec3 b = Vec3SubVec3(t->points[0]->position, t->points[2]->position);
+    Vec3 a = Vec3SubVec3(t->points[1]->position, t->points[0]->position);
+    Vec3 b = Vec3SubVec3(t->points[2]->position, t->points[0]->position);
+    // printf("%f, %f, %f\n", a.x, a.y, a.z);
+    // printf("%f, %f, %f\n", b.x, b.y, b.z);
+    Vec3 r = CrossProduct(a, b);
+
+    r = Vec3MultScalar(r, 1/(sqrt(pow(Vec3Norm(a), 2) * pow(Vec3Norm(b), 2) - pow(DotProduct(a, b), 2))));
+
+    return r;
+}
+
+Vec3 TNormal(Vec3 points[3]){
+    Vec3 a = Vec3SubVec3(points[1], points[0]);
+    Vec3 b = Vec3SubVec3(points[2], points[0]);
+    // printf("%f, %f, %f\n", a.x, a.y, a.z);
+    // printf("%f, %f, %f\n", b.x, b.y, b.z);
     Vec3 r = CrossProduct(a, b);
 
     r = Vec3MultScalar(r, 1/(sqrt(pow(Vec3Norm(a), 2) * pow(Vec3Norm(b), 2) - pow(DotProduct(a, b), 2))));

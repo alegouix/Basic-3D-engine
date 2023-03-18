@@ -57,18 +57,18 @@ int mainloop(SDL_Window* screen, SDL_Renderer* renderer){
     int n_triangles = 12;
     Triangle** triangles = (Triangle**)calloc(n_triangles, sizeof(Triangle*));
 
-    triangles[0] = NewTriangle(points[0], points[1], points[2], 0, 0, 1, 0, 0, 1);
-    triangles[1] = NewTriangle(points[3], points[1], points[2], 1, 0, 1, 1, 0, 1);
-    triangles[2] = NewTriangle(points[4], points[5], points[6], 0, 0, 1, 0, 0, 1);
-    triangles[3] = NewTriangle(points[7], points[5], points[6], 1, 0, 1, 1, 0, 1);
-    triangles[4] = NewTriangle(points[0], points[2], points[5], 0, 0, 1, 0, 0, 1);
-    triangles[5] = NewTriangle(points[0], points[4], points[5], 1, 0, 1, 1, 0, 1);
-    triangles[6] = NewTriangle(points[1], points[3], points[6], 0, 0, 1, 0, 0, 1);
-    triangles[7] = NewTriangle(points[7], points[3], points[6], 1, 0, 1, 1, 0, 1);
-    triangles[8] = NewTriangle(points[0], points[1], points[4], 0, 0, 1, 0, 0, 1);
-    triangles[9] = NewTriangle(points[6], points[1], points[4], 1, 0, 1, 1, 0, 1);
-    triangles[10] = NewTriangle(points[2], points[3], points[5], 0, 0, 1, 0, 0, 1);
-    triangles[11] = NewTriangle(points[7], points[3], points[5], 1, 0, 1, 1, 0, 1);
+    triangles[0] = NewTriangle(points[0], points[2], points[1], 1, 1, 1, 0, 0, 1);
+    triangles[1] = NewTriangle(points[3], points[1], points[2], 0, 0, 0, 1, 1, 0);
+    triangles[2] = NewTriangle(points[4], points[6], points[5], 0, 1, 1, 1, 0, 0);
+    triangles[3] = NewTriangle(points[7], points[5], points[6], 1, 0, 0, 0, 1, 1);
+    triangles[4] = NewTriangle(points[0], points[5], points[2], 0, 1, 1, 0, 0, 0);
+    triangles[5] = NewTriangle(points[0], points[4], points[5], 0, 1, 1, 1, 1, 0);
+    triangles[6] = NewTriangle(points[1], points[3], points[6], 1, 1, 1, 0, 0, 1);
+    triangles[7] = NewTriangle(points[7], points[6], points[3], 0, 0, 0, 1, 1, 0);
+    triangles[8] = NewTriangle(points[0], points[1], points[4], 1, 1, 1, 0, 0, 1);
+    triangles[9] = NewTriangle(points[6], points[4], points[1], 0, 0, 0, 1, 1, 0);
+    triangles[10] = NewTriangle(points[2], points[5], points[3], 1, 0, 0, 0, 1, 1);
+    triangles[11] = NewTriangle(points[7], points[3], points[5], 0, 1, 1, 1, 0, 0);
 
 
 
@@ -97,9 +97,6 @@ int mainloop(SDL_Window* screen, SDL_Renderer* renderer){
             }
         }
 
-        // for (int i=0; i<n_points; i++){
-        //     points[i]->position.z -= 1;
-        // }
         *ROTATION = Vec3AddVec3(*ROTATION, rotation);
         if (ROTATION->x > 2*M_PI){
             ROTATION->x -= 2*M_PI;
@@ -130,6 +127,9 @@ int mainloop(SDL_Window* screen, SDL_Renderer* renderer){
 }
 
 int main(){
+    Triangle* t = NewTriangle(NewPoint(0, 0, 0), NewPoint(0, 1, 0), NewPoint(0, 0, 1), 0, 0, 0, 0, 0, 0);
+    Vec3 n = TriangleNormal(t);
+    printf("%f, %f, %f\n", n.x, n.y, n.z);
     printf("initializing SDL...");
     if (init()){
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, SDL_GetError());

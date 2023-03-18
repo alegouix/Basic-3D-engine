@@ -53,18 +53,29 @@ double get_triangle_dist(Triangle* t){
     double avg = (t->draw_points[2]->position.z + t->draw_points[1]->position.z + t->draw_points[0]->position.z) / 3;
     return avg;
 }
+
+/* the points of a triangle after projection and rotation */
 int needs_draw(Triangle* t){
-    // double a = DotProduct(TriangleNormal(t), NewVec3(0, 0, 1));
-    // printf("%f\n", a);
-    return 1;// && get_triangle_dist(t) > 0;
-    // return abs(a) < 1000;// && get_triangle_dist(t) > 0;
+    Vec3 points[3];
+    points[0] = RotatePoint(t->points[0], *ROTATION)->position;
+    points[1] = RotatePoint(t->points[1], *ROTATION)->position;
+    points[2] = RotatePoint(t->points[2], *ROTATION)->position;
+    double a = DotProduct(TNormal(points), Vec3SubVec3(NewVec3(0, 0, -*Z0), points[0]));
+
+    // printf("--------------------\n");
+    // Vec3 v = TNormal(points);
+    // printf("%f, %f, %f\n", v.x, v.y, v.z);
+    // v = Vec3MultScalar(points[0], -1);
+    // printf("%f, %f, %f\n", v.x, v.y, v.z);
+    // printf("%.7f\n", a);
+    return a > 0.0000001;
 }
 
 void DrawTriangleFrame(SDL_Renderer* renderer, Triangle** triangles, int n_triangles){
     Vec3 proj, projections[3];
     // sort_triangles(&triangles, n_triangles);
     for (int i=0; i<n_triangles; i++){
-        // if (!needs_draw(triangles[i])){continue;}
+        if (!needs_draw(triangles[i])){continue;}
         for (int j=0; j<3; j++){
             // triangles[i]->points[j]->position.z += 100;
             proj = GetProjection(triangles[i]->points[j]);
@@ -74,15 +85,15 @@ void DrawTriangleFrame(SDL_Renderer* renderer, Triangle** triangles, int n_trian
             // printf("%lf, %lf, %lf\n", proj.x, proj.y, proj.z);
         }
 
-        // char c[3] = {255, 255, 255};
-        // DrawFilledTriangle(renderer, projections[0], projections[1], projections[2], c);
         DrawTexturedTriangle(renderer, triangles[i]->texture, projections[0], projections[1], projections[2], triangles[i]->uv);
+
+        /*draw normal vector for debug*/
+        // Vec3 v = TNormal(projections);
+        // int x = projections[0].x + 100* v.x;
+        // int y = projections[0].y + 100* v.y;
+        // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+        // SDL_RenderDrawLine(renderer, projections[0].x, projections[0].y, x, y);
     }
-
-    // for (int i=0; i<n_lines; i++){
-    //     SDL_RenderDrawLine(renderer, projections[lines[i][0]].x, projections[lines[i][0]].y, projections[lines[i][1]].x, projections[lines[i][1]].y);
-    // }
-
 }
 
 void DrawWireFrame(SDL_Renderer* renderer, Point** points, int *lines[2], int n_points, int n_lines){
@@ -256,10 +267,13 @@ int DrawFilledTriangle (SDL_Renderer* renderer, Vec3 P0, Vec3 P1, Vec3 P2, char 
     return 0;
 }
 
-int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0, Vec3 P1, Vec3 P2, Point2D* uv) {
+int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0, Vec3 P1, Vec3 P2, Point2D* UV) {
    // Sort the points so that y0 <= y1 <= y2
    
     // int texture_width, texture_height;
+
+    Point2D* uv = (Point2D*)calloc(3, sizeof(Point2D));
+    memcpy(uv, UV, sizeof(Point2D)*3);
 
    P0 = Vec3Round(P0);
    P1 = Vec3Round(P1);
@@ -289,13 +303,12 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
     //     x012[i+s1] = x12[i];
     // }
 
-    double z, zr, zl;
+    double z, zr, zl, pa, pb, dx;
     double *short_segment = x01;
-    int ind=0, s=0;
+    int ind=0, s=0; /* s is set to 1 when we switch between short segments */
     Uint8 r=0,g=0,b=0;
-    Point2D pl, pr, p;
+    Point2D pl, pr, p, p1, p2;
 
-    // SDL_SetRenderDrawColor(renderer, color[0], color[1], color[2], 255);
    // Draw the horizontal segments
     for (int y=1; y<s3-1; y++){
         // printf("the y is %d\n", y);
@@ -334,8 +347,28 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
                 // printf("%p, %d\n", texture, px_index);
                 // printf("%u\n", ((Uint32*)texture->pixels)[px_index]);
                 if (z<0 || z < DEPTH_BUFFER[((int)P0.y+y)**WINDOW_WIDTH + x]){
-                    p.x = (double)texture->w * fmin(texture->w - 1, (lerp(fmin(pl.x, pr.x), fmax(pl.x, pr.x), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
-                    p.y = (double)texture->h * fmin(texture->h - 1, (lerp(fmin(pl.y, pr.y), fmax(pl.y, pr.y), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
+                    dx = (x-ceil(short_segment[y-ind]))/(x02[y]-ceil(short_segment[y-ind]));
+
+                    pa = (double)(y)/(s3-1); /*pos on 0-2 side*/
+                    p1.x = lerp(uv[0].x, uv[2].x, pa);
+                    p1.y = lerp(uv[0].y, uv[2].y, pa);
+
+
+                    if (!s){
+                        pb = (double)y / s1; /* pos on 0-1 side */
+                        p2.x = lerp(uv[0].x, uv[1].x, pb);
+                        p2.y = lerp(uv[0].y, uv[1].y, pb);
+                    }else{
+                        pb = (double)(y-ind) / s2; /* pos on 1-2 side */
+                        p2.x = lerp(uv[1].x, uv[2].x, pb);
+                        p2.y = lerp(uv[1].y, uv[2].y, pb);
+                    }
+
+                    p.x = texture->w * lerp(p2.x, p1.x, dx);
+                    p.y = texture->h * lerp(p2.y, p1.y, dx);
+
+                    // printf("%f, %f, %f\n", pa, pb, dx);
+                    // printf("%f, %f\n", p.x, p.y);
 
                     SDL_GetRGB(getpixel(texture, p.x, p.y), texture->format, &r, &g, &b);
                     SDL_SetRenderDrawColor(renderer, r, g, b, 255);
@@ -363,8 +396,25 @@ int DrawTexturedTriangle (SDL_Renderer* renderer, SDL_Surface* texture, Vec3 P0,
                 //     printf("%f, %f\n", x02[y], short_segment[y-ind]);
                 // }
                 if (z < DEPTH_BUFFER[((int)P0.y+y)**WINDOW_WIDTH + x]){
-                    p.x = (double)texture->w * fmin(texture->w - 1, (lerp(fmin(pl.x, pr.x), fmax(pl.x, pr.x), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
-                    p.y = (double)texture->h * fmin(texture->h - 1, (lerp(fmin(pl.y, pr.y), fmax(pl.y, pr.y), (double)(x-short_segment[y-ind])/(x02[y]-short_segment[y-ind]))));
+                    dx = (x-ceil(short_segment[y-ind]))/(x02[y]-ceil(short_segment[y-ind]));
+
+                    pa = (double)(y)/(s3-1); /*pos on 0-2 side*/
+                    p1.x = lerp(uv[0].x, uv[2].x, pa);
+                    p1.y = lerp(uv[0].y, uv[2].y, pa);
+
+
+                    if (!s){
+                        pb = (double)y / s1; /* pos on 0-1 side */
+                        p2.x = lerp(uv[0].x, uv[1].x, pb);
+                        p2.y = lerp(uv[0].y, uv[1].y, pb);
+                    }else{
+                        pb = (double)(y-ind) / s2; /* pos on 1-2 side */
+                        p2.x = lerp(uv[1].x, uv[2].x, pb);
+                        p2.y = lerp(uv[1].y, uv[2].y, pb);
+                    }
+
+                    p.x = texture->w * lerp(p2.x, p1.x, dx);
+                    p.y = texture->h * lerp(p2.y, p1.y, dx);
 
                     SDL_GetRGB(getpixel(texture, p.x, p.y), texture->format, &r, &g, &b);
                     SDL_SetRenderDrawColor(renderer, r, g, b, 255);
